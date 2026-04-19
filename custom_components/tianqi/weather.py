@@ -132,6 +132,7 @@ class WeatherEntity(BaseEntity):
             ]}
 
         indexes = {}
+        indexes_short = {}
         for k, v in dataZS.items():
             if '_name' not in k:
                 continue
@@ -139,8 +140,12 @@ class WeatherEntity(BaseEntity):
             if not (des := dataZS.get(f'{key}_des_s')):
                 continue
             indexes[v] = des
+            if hint := dataZS.get(f'{key}_hint'):
+                indexes_short[v.removesuffix('指数')] = hint
         if indexes:
             self._attr_extra_state_attributes['indexes'] = indexes
+        if indexes_short:
+            self._attr_extra_state_attributes['indexes_short'] = indexes_short
 
         forecasts = await self.async_forecast_daily()
         if hasattr(self, '_attr_forecast'):
